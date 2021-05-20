@@ -9,22 +9,25 @@ var mainCanvasDiv,
   ring;
 
 function initializeMainRenderer() {
-  app = new PIXI.Application();
+  app = new PIXI.Application({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
   mainCanvasDiv = document.getElementById("main-display");
   mainCanvasDiv.appendChild(app.view);
   viewport = new pixi_viewport.Viewport({
     screenWidth: window.innerWidth,
     screenHeight: window.innerHeight,
-    worldWidth: window.innerWidth,
-    worldHeight: window.innerHeight,
+    worldWidth: 500,
+    worldHeight: 500,
     interaction: app.renderer.plugins.interaction,
   });
-  viewport.drag().wheel().pinch().decelerate();
+  viewport.wheel().pinch().decelerate();
   focusStage = new PIXI.Container();
   bgStage = new PIXI.Container();
   rootStage = new PIXI.Container();
   app.stage.addChild(viewport);
-  //viewport.fit();
+  viewport.fit();
 
   PIXI.Loader.shared
     .add([
@@ -55,11 +58,15 @@ function setup() {
   ring = new PIXI.Sprite(PIXI.Loader.shared.resources["ring"].texture);
   ring.anchor.set(0.5);
   ring.visible = false;
+  bgSprite.width = app.screen.width / 2;
+  bgSprite.height = app.screen.height / 2;
   viewport.addChild(bgSprite);
   viewport.addChild(ring);
   viewport.on("mousemove", onPointerMove).on("touchmove", onPointerMove);
   //viewport.follow(ring);
-  viewport.mouseEdges();
+  viewport.mouseEdges({
+    radius: 400,
+  });
 }
 
 window.onload = () => {
