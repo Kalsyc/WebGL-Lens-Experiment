@@ -27,7 +27,7 @@ function initializeMainRenderer() {
   bgStage = new PIXI.Container();
   rootStage = new PIXI.Container();
   app.stage.addChild(viewport);
-  viewport.fit();
+  //viewport.fit();
 
   PIXI.Loader.shared
     .add([
@@ -52,6 +52,24 @@ function onPointerMove(eventData) {
   ring.position.set(eventData.data.global.x, eventData.data.global.y);
 }
 
+function onMouseMove() {
+  ring.visible = true;
+  const pt = new PIXI.Point(
+    app.renderer.plugins.interaction.mouse.global.x,
+    app.renderer.plugins.interaction.mouse.global.y
+  );
+  const pt2 = viewport.toLocal(pt);
+  ring.position.set(pt2.x, pt2.y);
+}
+
+function trySnap() {
+  ring.visible = true;
+  viewport.snap({
+    x: app.renderer.plugins.interaction.mouse.global.x,
+    y: app.renderer.plugins.interaction.mouse.global.y,
+  });
+}
+
 function setup() {
   bgSprite = new PIXI.Sprite(PIXI.Loader.shared.resources["bg"].texture);
   focusSprite = new PIXI.Sprite(PIXI.Loader.shared.resources["focus"].texture);
@@ -62,12 +80,31 @@ function setup() {
   bgSprite.height = app.screen.height / 2;
   viewport.addChild(bgSprite);
   viewport.addChild(ring);
-  viewport.on("mousemove", onPointerMove).on("touchmove", onPointerMove);
+  ring.visible = true;
+  ring.on("mousemove", onMouseMove);
+  //viewport.on("moved", onMouseMove);
+  viewport.clamp({
+    left: 0,
+    right: bgSprite.width,
+    top: 0,
+    bottom: bgSprite.height,
+  });
+
+  viewport
+    .on("mousemove", onMouseMove)
+    .on("touchmove", onPointerMove)
+    .on("mouse-edge-start", onMouseMove)
+    .on("mouse-edge-end", onMouseMove);
+
   //viewport.follow(ring);
   viewport.mouseEdges({
-    radius: 400,
+    radius: 500,
   });
+  //console.log(app.ticker);
+  viewport.on("click", clickf);
 }
+
+function clickf() {}
 
 window.onload = () => {
   initializeMainRenderer();
