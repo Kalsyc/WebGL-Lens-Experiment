@@ -3,10 +3,12 @@ var mainCanvasDiv,
   bgStage,
   focusStage,
   rootStage,
-  bgSprite,
+  clearSprite,
   focusSprite,
   app,
   displace,
+  circle,
+  circleTexture,
   ring;
 
 function initializeMainRenderer() {
@@ -66,6 +68,7 @@ function onMouseMove() {
   const pt2 = viewport.toLocal(pt);
   ring.position.set(pt2.x, pt2.y);
   displace.position.copyFrom(ring);
+  circle.position.copyFrom(ring);
 }
 
 function trySnap() {
@@ -77,16 +80,19 @@ function trySnap() {
 }
 
 function setup() {
-  bgSprite = new PIXI.Sprite(PIXI.Loader.shared.resources["bg"].texture);
+  clearSprite = new PIXI.Sprite(PIXI.Loader.shared.resources["focus"].texture);
   focusSprite = new PIXI.Sprite(PIXI.Loader.shared.resources["focus"].texture);
   ring = new PIXI.Sprite(PIXI.Loader.shared.resources["ring"].texture);
   displace = new PIXI.Sprite(PIXI.Loader.shared.resources["displace"].texture);
   displacementFilter = new PIXI.filters.DisplacementFilter(displace);
   ring.anchor.set(0.5);
   ring.visible = false;
-  bgSprite.width = app.screen.width / 2;
-  bgSprite.height = app.screen.height / 2;
-  viewport.addChild(bgSprite);
+  focusSprite.width = app.screen.width / 2;
+  focusSprite.height = app.screen.height / 2;
+  clearSprite.width = app.screen.width / 2;
+  clearSprite.height = app.screen.height / 2;
+  viewport.addChild(focusSprite);
+  viewport.addChild(clearSprite);
   viewport.addChild(ring);
   viewport.addChild(displace);
   displace.anchor.set(0.5);
@@ -95,10 +101,19 @@ function setup() {
   ring.on("mousemove", onMouseMove);
   viewport.clamp({
     left: 0,
-    right: bgSprite.width,
+    right: focusSprite.width,
     top: 0,
-    bottom: bgSprite.height,
+    bottom: focusSprite.height,
   });
+  circle = new PIXI.Graphics()
+    .beginFill(0xff0000)
+    .drawCircle(0, 0, ring.height / 2)
+    .endFill();
+  //circleTexture = app.renderer.generateTexture();
+  viewport.addChild(circle);
+  clearSprite.mask = circle;
+  //focusSprite.mask = circle;
+  focusSprite.filters = [new PIXI.filters.BlurFilter()];
 
   viewport
     .on("mousemove", onMouseMove)
