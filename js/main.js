@@ -6,6 +6,7 @@ var mainCanvasDiv,
   bgSprite,
   focusSprite,
   app,
+  displace,
   ring;
 
 function initializeMainRenderer() {
@@ -43,6 +44,10 @@ function initializeMainRenderer() {
         name: "ring",
         url: "./images/ring.png",
       },
+      {
+        name: "displace",
+        url: "./images/displace.png",
+      },
     ])
     .load(setup);
 }
@@ -60,6 +65,7 @@ function onMouseMove() {
   );
   const pt2 = viewport.toLocal(pt);
   ring.position.set(pt2.x, pt2.y);
+  displace.position.copyFrom(ring);
 }
 
 function trySnap() {
@@ -74,15 +80,19 @@ function setup() {
   bgSprite = new PIXI.Sprite(PIXI.Loader.shared.resources["bg"].texture);
   focusSprite = new PIXI.Sprite(PIXI.Loader.shared.resources["focus"].texture);
   ring = new PIXI.Sprite(PIXI.Loader.shared.resources["ring"].texture);
+  displace = new PIXI.Sprite(PIXI.Loader.shared.resources["displace"].texture);
+  displacementFilter = new PIXI.filters.DisplacementFilter(displace);
   ring.anchor.set(0.5);
   ring.visible = false;
   bgSprite.width = app.screen.width / 2;
   bgSprite.height = app.screen.height / 2;
   viewport.addChild(bgSprite);
   viewport.addChild(ring);
-  ring.visible = true;
+  viewport.addChild(displace);
+  displace.anchor.set(0.5);
+  displacementFilter.scale.set(110);
+  //viewport.filters = [displacementFilter];
   ring.on("mousemove", onMouseMove);
-  //viewport.on("moved", onMouseMove);
   viewport.clamp({
     left: 0,
     right: bgSprite.width,
