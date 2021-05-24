@@ -9,6 +9,7 @@ var mainCanvasDiv,
   displace,
   circle,
   circleTexture,
+  maskLens,
   ring;
 
 function initializeMainRenderer() {
@@ -50,6 +51,10 @@ function initializeMainRenderer() {
         name: "displace",
         url: "./images/displace.png",
       },
+      {
+        name: "mask-lens",
+        url: "./images/mask-lens2.png",
+      },
     ])
     .load(setup);
 }
@@ -69,6 +74,7 @@ function onMouseMove() {
   ring.position.set(pt2.x, pt2.y);
   displace.position.copyFrom(ring);
   circle.position.copyFrom(ring);
+  maskLens.position.copyFrom(ring);
 }
 
 function trySnap() {
@@ -93,10 +99,12 @@ function setup() {
   clearSprite.height = app.screen.height / 2;
   viewport.addChild(focusSprite);
   viewport.addChild(clearSprite);
+
   viewport.addChild(ring);
   viewport.addChild(displace);
   displace.anchor.set(0.5);
-  displacementFilter.scale.set(110);
+  displacementFilter.scale.x = 0;
+  displacementFilter.scale.y = 100;
   //viewport.filters = [displacementFilter];
   ring.on("mousemove", onMouseMove);
   viewport.clamp({
@@ -109,11 +117,21 @@ function setup() {
     .beginFill(0xff0000)
     .drawCircle(0, 0, ring.height / 2)
     .endFill();
-  //circleTexture = app.renderer.generateTexture();
-  viewport.addChild(circle);
-  clearSprite.mask = circle;
+  maskLens = new PIXI.Sprite(PIXI.Loader.shared.resources["mask-lens"].texture);
+  maskLens.anchor.set(0.5);
+
+  clearSprite.mask = maskLens;
+  viewport.addChild(maskLens);
+
+  //viewport.addChild(circle);
+  //clearSprite.mask = circle;
+  maskLens.scale.set(1.35);
   //focusSprite.mask = circle;
-  focusSprite.filters = [new PIXI.filters.BlurFilter()];
+  //clearSprite.filters = [new PIXI.SpriteMaskFilter(maskLens)];
+  const f = new PIXI.filters.BlurFilter(20, 16);
+  f.blurX = 4;
+  f.blurY = 20;
+  focusSprite.filters = [f];
 
   viewport
     .on("mousemove", onMouseMove)
