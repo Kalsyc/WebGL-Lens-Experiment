@@ -53,7 +53,7 @@ function initializeMainRenderer() {
       },
       {
         name: "mask-lens",
-        url: "./images/mask-lens2.png",
+        url: "./images/mask-lens3.png",
       },
     ])
     .load(setup);
@@ -121,6 +121,8 @@ function setup() {
   maskLens.anchor.set(0.5);
 
   clearSprite.mask = maskLens;
+  const newContainer = new PIXI.Container();
+  newContainer.addChild(maskLens);
   viewport.addChild(maskLens);
 
   //viewport.addChild(circle);
@@ -128,9 +130,9 @@ function setup() {
   maskLens.scale.set(1.35);
   //focusSprite.mask = circle;
   //clearSprite.filters = [new PIXI.SpriteMaskFilter(maskLens)];
-  const f = new PIXI.filters.BlurFilter(20, 16);
-  f.blurX = 4;
-  f.blurY = 20;
+  const f = new PIXI.filters.BlurFilter(20, 20);
+  const g = new PIXI.filters.BlurFilter(10, 10);
+  //clearSprite.filters = [g];
   focusSprite.filters = [f];
 
   viewport
