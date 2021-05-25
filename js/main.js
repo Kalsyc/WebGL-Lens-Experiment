@@ -6,9 +6,6 @@ var mainCanvasDiv,
   app,
   displace,
   circle,
-  circleTexture,
-  maskLens,
-  hourglass,
   semicircle,
   ring;
 
@@ -44,105 +41,143 @@ function initializeMainRenderer() {
         url: "./images/displace.png",
       },
       {
-        name: "semicircle",
+        name: "lenses",
         url: "./images/semicircle.png",
       },
     ])
     .load(setup);
 }
 
-function onPointerMove(eventData) {
-  ring.visible = true;
-  ring.position.set(eventData.data.global.x, eventData.data.global.y);
-}
-
 function onMouseMove() {
-  ring.visible = true;
-  const pt = new PIXI.Point(
-    app.renderer.plugins.interaction.mouse.global.x,
-    app.renderer.plugins.interaction.mouse.global.y
-  );
-  const pt2 = viewport.toLocal(pt);
-  ring.position.set(pt2.x, pt2.y);
-  displace.position.copyFrom(ring);
-  circle.position.copyFrom(ring);
-  semicircle.position.copyFrom(ring);
+  const pt = viewport.toLocal(app.renderer.plugins.interaction.mouse.global);
+  circle.position.set(pt.x, pt.y);
+  semicircle.position.copyFrom(circle);
+  if (ring) {
+    ring.visible = true;
+    ring.position.copyFrom(circle);
+  }
+  if (displace) {
+    displace.position.copyFrom(circle);
+  }
 }
 
-function trySnap() {
-  ring.visible = true;
-  viewport.snap({
-    x: app.renderer.plugins.interaction.mouse.global.x,
-    y: app.renderer.plugins.interaction.mouse.global.y,
-  });
+function instantiateSprite(name) {
+  return new PIXI.Sprite(PIXI.Loader.shared.resources[name].texture);
+}
+
+function setupSprites() {
+  clearSprite = instantiateSprite("focus");
+  focusSprite = instantiateSprite("focus");
+  blurSprite = instantiateSprite("focus");
+}
+
+function setupRing() {
+  ring = instantiateSprite("ring");
+  ring.anchor.set(0.5);
+  ring.scale.set(0.8);
+  viewport.addChild(ring);
+  ring.visible = false;
+}
+
+function setupDisplacement() {
+  displace = instantiateSprite("displace");
+  viewport.addChild(displace);
+  displacementFilter = new PIXI.filters.DisplacementFilter(displace);
+  displace.anchor.set(0.5);
+  displacementFilter.scale.x = 0;
+  displacementFilter.scale.y = 100;
+  viewport.filters = [displacementFilter];
+}
+
+function setupLensBlur() {
+  semicircle = instantiateSprite("lenses");
+  semicircle.anchor.set(0.5);
+  viewport.addChild(semicircle);
+  blurSprite.mask = semicircle;
+}
+
+function setupLensClear() {
+  circle = setupCircleMaskGraphics(ring ? ring.height / 2 : 60);
+  clearSprite.mask = circle;
+  viewport.addChild(circle);
+}
+
+function restrictSize(sprite) {
+  sprite.height = app.screen.height / 2;
+  sprite.width = app.screen.width / 2;
+}
+
+function setupBlurFiter(sprite, strength, quality) {
+  sprite.filters = [new PIXI.filters.BlurFilter(strength, quality)];
+}
+
+function setupCircleMaskGraphics(radius = 60) {
+  return new PIXI.Graphics()
+    .beginFill(0xff0000)
+    .drawCircle(0, 0, radius)
+    .endFill();
 }
 
 function setup() {
-  clearSprite = new PIXI.Sprite(PIXI.Loader.shared.resources["focus"].texture);
-  focusSprite = new PIXI.Sprite(PIXI.Loader.shared.resources["focus"].texture);
-  blurSprite = new PIXI.Sprite(PIXI.Loader.shared.resources["focus"].texture);
-  ring = new PIXI.Sprite(PIXI.Loader.shared.resources["ring"].texture);
-  displace = new PIXI.Sprite(PIXI.Loader.shared.resources["displace"].texture);
-  displacementFilter = new PIXI.filters.DisplacementFilter(displace);
-  ring.anchor.set(0.5);
-  ring.scale.set(0.8);
-  ring.visible = false;
-  focusSprite.width = app.screen.width / 2;
-  focusSprite.height = app.screen.height / 2;
-  clearSprite.width = app.screen.width / 2;
-  clearSprite.height = app.screen.height / 2;
-  blurSprite.width = app.screen.width / 2;
-  blurSprite.height = app.screen.height / 2;
+  setupSprites();
+
+  restrictSize(focusSprite);
+  restrictSize(clearSprite);
+  restrictSize(blurSprite);
+
   viewport.addChild(focusSprite);
   viewport.addChild(clearSprite);
   viewport.addChild(blurSprite);
 
-  viewport.addChild(ring);
-  viewport.addChild(displace);
-  displace.anchor.set(0.5);
-  displacementFilter.scale.x = 0;
-  displacementFilter.scale.y = 100;
-  //viewport.filters = [displacementFilter];
-  ring.on("mousemove", onMouseMove);
+  setupRing();
+  //setupDisplacement();
+
+  setupLensBlur();
+  setupLensClear();
+
+  setupBlurFiter(focusSprite, 20, 2);
+  setupBlurFiter(blurSprite, 30, 10);
+
+  //Configure viewport
+
   viewport.clamp({
     left: 0,
     right: focusSprite.width,
     top: 0,
     bottom: focusSprite.height,
   });
-  circle = new PIXI.Graphics()
-    .beginFill(0xff0000)
-    .drawCircle(0, 0, ring.height / 2)
-    .endFill();
-  semicircle = new PIXI.Sprite(
-    PIXI.Loader.shared.resources["semicircle"].texture
-  );
-  semicircle.anchor.set(0.5);
-
-  clearSprite.mask = circle;
-  blurSprite.mask = semicircle;
-
-  viewport.addChild(semicircle);
-  viewport.addChild(circle);
-  const f = new PIXI.filters.BlurFilter(20, 2);
-  const g = new PIXI.filters.BlurFilter(30, 10);
-  focusSprite.filters = [f];
-  blurSprite.filters = [g];
 
   viewport
     .on("mousemove", onMouseMove)
-    .on("touchmove", onPointerMove)
+    .on("touchmove", onMouseMove)
     .on("mouse-edge-start", onMouseMove)
     .on("mouse-edge-end", onMouseMove);
 
   viewport.mouseEdges({
     radius: 500,
   });
-  viewport.on("click", clickf);
 }
-
-function clickf() {}
 
 window.onload = () => {
   initializeMainRenderer();
 };
+
+/*
+function onMouseMove() {
+  const pt = new PIXI.Point(
+    app.renderer.plugins.interaction.mouse.global.x,
+    app.renderer.plugins.interaction.mouse.global.y
+  );
+  const pt2 = viewport.toLocal(app.renderer.plugins.interaction.mouse.global);
+  circle.position.set(pt2.x, pt2.y);
+  circle.position.copyFrom(circle);
+  semicircle.position.copyFrom(circle);
+  if (ring) {
+    ring.visible = true;
+    ring.position.copyFrom(circle);
+  }
+  if (displace) {
+    displace.position.copyFrom(circle);
+  }
+}
+*/
