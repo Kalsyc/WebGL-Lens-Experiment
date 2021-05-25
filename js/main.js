@@ -134,7 +134,7 @@ function setup() {
   viewport.addChild(blurSprite);
 
   setupRing();
-  setupDisplacement();
+  setupDisplacement(190, 190);
 
   setupLensBlur();
   setupLensClear();

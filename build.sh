@@ -5,8 +5,8 @@ mkdir dist
 cp -R images dist/images
 cp -R fonts dist/fonts
 cp favicon.ico thumbnail.png title_and_description.txt dist
-uglifyjs-folder src -o dist/js/all.min.js
-#css-minify -d css
+uglifyjs-folder js -o dist/js/all.min.js
+# css-minify -d css
 mkdir dist/styles
 # mv css-dist/main.min.css dist/css/main.min.css
 cp styles/main.css dist/styles/main.css
