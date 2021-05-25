@@ -4,12 +4,15 @@ var mainCanvasDiv,
   focusStage,
   rootStage,
   clearSprite,
+  blurSprite,
   focusSprite,
   app,
   displace,
   circle,
   circleTexture,
   maskLens,
+  hourglass,
+  semicircle,
   ring;
 
 function initializeMainRenderer() {
@@ -31,7 +34,6 @@ function initializeMainRenderer() {
   bgStage = new PIXI.Container();
   rootStage = new PIXI.Container();
   app.stage.addChild(viewport);
-  //viewport.fit();
 
   PIXI.Loader.shared
     .add([
@@ -55,6 +57,14 @@ function initializeMainRenderer() {
         name: "mask-lens",
         url: "./images/mask-lens3.png",
       },
+      {
+        name: "hourglass",
+        url: "./images/clear-hourglass.png",
+      },
+      {
+        name: "semicircle",
+        url: "./images/semicircle.png",
+      },
     ])
     .load(setup);
 }
@@ -75,6 +85,9 @@ function onMouseMove() {
   displace.position.copyFrom(ring);
   circle.position.copyFrom(ring);
   maskLens.position.copyFrom(ring);
+  hourglass.position.copyFrom(ring);
+  semicircle.position.copyFrom(ring);
+  circle.position.copyFrom(ring);
 }
 
 function trySnap() {
@@ -88,17 +101,22 @@ function trySnap() {
 function setup() {
   clearSprite = new PIXI.Sprite(PIXI.Loader.shared.resources["focus"].texture);
   focusSprite = new PIXI.Sprite(PIXI.Loader.shared.resources["focus"].texture);
+  blurSprite = new PIXI.Sprite(PIXI.Loader.shared.resources["focus"].texture);
   ring = new PIXI.Sprite(PIXI.Loader.shared.resources["ring"].texture);
   displace = new PIXI.Sprite(PIXI.Loader.shared.resources["displace"].texture);
   displacementFilter = new PIXI.filters.DisplacementFilter(displace);
   ring.anchor.set(0.5);
+  ring.scale.set(0.8);
   ring.visible = false;
   focusSprite.width = app.screen.width / 2;
   focusSprite.height = app.screen.height / 2;
   clearSprite.width = app.screen.width / 2;
   clearSprite.height = app.screen.height / 2;
+  blurSprite.width = app.screen.width / 2;
+  blurSprite.height = app.screen.height / 2;
   viewport.addChild(focusSprite);
   viewport.addChild(clearSprite);
+  viewport.addChild(blurSprite);
 
   viewport.addChild(ring);
   viewport.addChild(displace);
@@ -118,22 +136,25 @@ function setup() {
     .drawCircle(0, 0, ring.height / 2)
     .endFill();
   maskLens = new PIXI.Sprite(PIXI.Loader.shared.resources["mask-lens"].texture);
+  hourglass = new PIXI.Sprite(
+    PIXI.Loader.shared.resources["hourglass"].texture
+  );
+  semicircle = new PIXI.Sprite(
+    PIXI.Loader.shared.resources["semicircle"].texture
+  );
+  hourglass.anchor.set(0.5);
+  semicircle.anchor.set(0.5);
   maskLens.anchor.set(0.5);
 
-  clearSprite.mask = maskLens;
-  const newContainer = new PIXI.Container();
-  newContainer.addChild(maskLens);
-  viewport.addChild(maskLens);
+  clearSprite.mask = circle;
+  blurSprite.mask = semicircle;
 
-  //viewport.addChild(circle);
-  //clearSprite.mask = circle;
-  maskLens.scale.set(1.35);
-  //focusSprite.mask = circle;
-  //clearSprite.filters = [new PIXI.SpriteMaskFilter(maskLens)];
-  const f = new PIXI.filters.BlurFilter(20, 20);
-  const g = new PIXI.filters.BlurFilter(10, 10);
-  //clearSprite.filters = [g];
+  viewport.addChild(semicircle);
+  viewport.addChild(circle);
+  const f = new PIXI.filters.BlurFilter(5, 5);
+  const g = new PIXI.filters.BlurFilter(20, 10);
   focusSprite.filters = [f];
+  blurSprite.filters = [g];
 
   viewport
     .on("mousemove", onMouseMove)
@@ -141,11 +162,9 @@ function setup() {
     .on("mouse-edge-start", onMouseMove)
     .on("mouse-edge-end", onMouseMove);
 
-  //viewport.follow(ring);
   viewport.mouseEdges({
     radius: 500,
   });
-  //console.log(app.ticker);
   viewport.on("click", clickf);
 }
 
