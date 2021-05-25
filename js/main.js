@@ -44,6 +44,10 @@ function initializeMainRenderer() {
         name: "lenses",
         url: "./images/semicircle.png",
       },
+      {
+        name: "lenses-all",
+        url: "./images/semicircle-all.png",
+      },
     ])
     .load(setup);
 }
@@ -79,18 +83,18 @@ function setupRing() {
   ring.visible = false;
 }
 
-function setupDisplacement() {
+function setupDisplacement(scaleX = 70, scaleY = 0) {
   displace = instantiateSprite("displace");
   viewport.addChild(displace);
   displacementFilter = new PIXI.filters.DisplacementFilter(displace);
   displace.anchor.set(0.5);
-  displacementFilter.scale.x = 0;
-  displacementFilter.scale.y = 100;
+  displacementFilter.scale.x = scaleX;
+  displacementFilter.scale.y = scaleY;
   viewport.filters = [displacementFilter];
 }
 
 function setupLensBlur() {
-  semicircle = instantiateSprite("lenses");
+  semicircle = instantiateSprite("lenses-all");
   semicircle.anchor.set(0.5);
   viewport.addChild(semicircle);
   blurSprite.mask = semicircle;
@@ -130,7 +134,7 @@ function setup() {
   viewport.addChild(blurSprite);
 
   setupRing();
-  //setupDisplacement();
+  setupDisplacement();
 
   setupLensBlur();
   setupLensClear();
@@ -139,6 +143,8 @@ function setup() {
   setupBlurFiter(blurSprite, 30, 10);
 
   //Configure viewport
+
+  viewport.zoomPercent(2);
 
   viewport.clamp({
     left: 0,
@@ -161,23 +167,3 @@ function setup() {
 window.onload = () => {
   initializeMainRenderer();
 };
-
-/*
-function onMouseMove() {
-  const pt = new PIXI.Point(
-    app.renderer.plugins.interaction.mouse.global.x,
-    app.renderer.plugins.interaction.mouse.global.y
-  );
-  const pt2 = viewport.toLocal(app.renderer.plugins.interaction.mouse.global);
-  circle.position.set(pt2.x, pt2.y);
-  circle.position.copyFrom(circle);
-  semicircle.position.copyFrom(circle);
-  if (ring) {
-    ring.visible = true;
-    ring.position.copyFrom(circle);
-  }
-  if (displace) {
-    displace.position.copyFrom(circle);
-  }
-}
-*/
