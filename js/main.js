@@ -1,8 +1,5 @@
 var mainCanvasDiv,
   viewport,
-  bgStage,
-  focusStage,
-  rootStage,
   clearSprite,
   blurSprite,
   focusSprite,
@@ -30,17 +27,10 @@ function initializeMainRenderer() {
     interaction: app.renderer.plugins.interaction,
   });
   viewport.wheel().pinch().decelerate();
-  focusStage = new PIXI.Container();
-  bgStage = new PIXI.Container();
-  rootStage = new PIXI.Container();
   app.stage.addChild(viewport);
 
   PIXI.Loader.shared
     .add([
-      {
-        name: "bg",
-        url: "./images/img_midground_bad.jpg",
-      },
       {
         name: "focus",
         url: "./images/img_midground_good.png",
@@ -52,14 +42,6 @@ function initializeMainRenderer() {
       {
         name: "displace",
         url: "./images/displace.png",
-      },
-      {
-        name: "mask-lens",
-        url: "./images/mask-lens3.png",
-      },
-      {
-        name: "hourglass",
-        url: "./images/clear-hourglass.png",
       },
       {
         name: "semicircle",
@@ -84,10 +66,7 @@ function onMouseMove() {
   ring.position.set(pt2.x, pt2.y);
   displace.position.copyFrom(ring);
   circle.position.copyFrom(ring);
-  maskLens.position.copyFrom(ring);
-  hourglass.position.copyFrom(ring);
   semicircle.position.copyFrom(ring);
-  circle.position.copyFrom(ring);
 }
 
 function trySnap() {
@@ -135,24 +114,18 @@ function setup() {
     .beginFill(0xff0000)
     .drawCircle(0, 0, ring.height / 2)
     .endFill();
-  maskLens = new PIXI.Sprite(PIXI.Loader.shared.resources["mask-lens"].texture);
-  hourglass = new PIXI.Sprite(
-    PIXI.Loader.shared.resources["hourglass"].texture
-  );
   semicircle = new PIXI.Sprite(
     PIXI.Loader.shared.resources["semicircle"].texture
   );
-  hourglass.anchor.set(0.5);
   semicircle.anchor.set(0.5);
-  maskLens.anchor.set(0.5);
 
   clearSprite.mask = circle;
   blurSprite.mask = semicircle;
 
   viewport.addChild(semicircle);
   viewport.addChild(circle);
-  const f = new PIXI.filters.BlurFilter(5, 5);
-  const g = new PIXI.filters.BlurFilter(20, 10);
+  const f = new PIXI.filters.BlurFilter(20, 2);
+  const g = new PIXI.filters.BlurFilter(30, 10);
   focusSprite.filters = [f];
   blurSprite.filters = [g];
 
