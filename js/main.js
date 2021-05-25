@@ -53,7 +53,9 @@ function initializeMainRenderer() {
 }
 
 function onMouseMove() {
-  const pt = viewport.toLocal(app.renderer.plugins.interaction.mouse.global);
+  const pt = viewport.toLocal(
+    app.renderer.plugins.interaction.eventData.data.global
+  );
   circle.position.set(pt.x, pt.y);
   semicircle.position.copyFrom(circle);
   if (ring) {
