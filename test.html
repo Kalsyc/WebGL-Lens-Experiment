@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" type="text/css" href="styles/main.css" />
+
+    <script src="js/pixi.min.js" type="text/javascript"></script>
+    <script src="js/viewport.min.js" type="text/javascript"></script>
+    <script src="js/test.js" type="text/javascript"></script>
+
+    <script id="fragShader" type="x-shader/x-frag">
+
+      uniform sampler2D image;
+
+      vec4 FragmentColor;
+
+      float offset[3];
+      float weight[3];
+
+      void main(void) {
+          offset[0] = 0.0;
+          offset[1] = 1.3846153846;
+          offset[2] = 3.2307692308;
+          weight[0] = 0.2270270270;
+          weight[1] = 0.3162162162;
+          weight[2] = 0.0702702703;
+          FragmentColor = texture2D(image, vec2(gl_FragCoord) / 1024.0) * weight[0];
+          for (int i=1; i<3; i++) {
+              FragmentColor +=
+                  texture2D(image, (vec2(gl_FragCoord) + vec2(0.0, offset[i])) / 1024.0)
+                      * weight[i];
+              FragmentColor +=
+                  texture2D(image, (vec2(gl_FragCoord) - vec2(0.0, offset[i])) / 1024.0)
+                      * weight[i];
+          }
+          gl_FragColor = FragmentColor;
+      }
+    </script>
+    <script id="blurShader" type="x-shader/x-vertex">
+      attribute vec2 aVertexPosition;
+      attribute vec2 aTextureCoord;
+
+      uniform mat3 projectionMatrix;
+
+      varying vec2 vTextureCoord;
+
+      void main(void)
+      {
+          gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+          vTextureCoord = aTextureCoord;
+      }
+    </script>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div id="zoom-display"></div>
+      <div id="main-display"></div>
+    </div>
+  </body>
+</html>
