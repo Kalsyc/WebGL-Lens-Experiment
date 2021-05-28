@@ -18,6 +18,10 @@ function initialize() {
         url: "./images/img_midground_good.png",
       },
       {
+        name: "grid",
+        url: "./images/grid2.jpg",
+      },
+      {
         name: "fragShader",
         url: "./shaders/shader.frag",
       },
@@ -43,22 +47,22 @@ function restrictSize(sprite) {
 }
 
 function setup() {
-  clearSprite = instantiateSprite("focus");
+  clearSprite = instantiateSprite("grid");
   restrictSize(clearSprite);
   app.stage.addChild(clearSprite);
   //sprite.filters = [new PIXI.filters.BlurFilter(20, 5)];
   const vertUniforms = {
     min_sigma: 0.0,
-    max_sigma: 3.0,
+    max_sigma: 2.0,
     sigma: 5,
-    dim: 0.001,
+    dim: 0.003,
     kernel: 8.0,
   };
   const horiUniforms = {
     min_sigma: 0.0,
-    max_sigma: 3.0,
+    max_sigma: 2.0,
     sigma: 5,
-    dim: 0.001,
+    dim: 0.003,
     kernel: 8.0,
   };
 
@@ -67,6 +71,7 @@ function setup() {
   const vertFilter = new PIXI.Filter(null, vShader, vertUniforms);
   const horiFilter = new PIXI.Filter(null, hShader, horiUniforms);
   clearSprite.filters = [horiFilter, vertFilter];
+  //clearSprite.filters = [new PIXI.filters.BlurFilter()];
 }
 
 window.onload = () => {

@@ -28,6 +28,7 @@ void main(void) {
   vec3 incrementalGaussian;
   
   vec4 avgValue = vec4(0.0, 0.0, 0.0, 0.0);
+
   float sd = (max_sigma - min_sigma) * vTextureCoord.x;
 
   avgValue += texture2D(uSampler, vTextureCoord.st) * calculateWeight(0.0, sd);

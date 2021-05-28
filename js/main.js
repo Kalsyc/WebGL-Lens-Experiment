@@ -10,6 +10,8 @@ var mainCanvasDiv,
   displace,
   circle,
   semicircle,
+  vertFilter,
+  horiFilter,
   ring;
 
 /**
@@ -40,6 +42,10 @@ function initializeMainRenderer() {
         url: "./images/img_midground_good.png",
       },
       {
+        name: "grid",
+        url: "./images/grid.png",
+      },
+      {
         name: "ring",
         url: "./images/ring.png",
       },
@@ -54,6 +60,14 @@ function initializeMainRenderer() {
       {
         name: "lenses-all",
         url: "./images/semicircle-all.png",
+      },
+      {
+        name: "horifrag",
+        url: "./shaders/test2.frag",
+      },
+      {
+        name: "vertfrag",
+        url: "./shaders/test3.frag",
       },
     ])
     .load(setup);
@@ -118,6 +132,7 @@ function setupDisplacement(scaleX = 70, scaleY = 0) {
 function setupLensBlur() {
   semicircle = instantiateSprite("lenses-all");
   semicircle.anchor.set(0.5);
+  semicircle.scale.set(2);
   viewport.addChild(semicircle);
   blurSprite.mask = semicircle;
 }
@@ -158,7 +173,7 @@ function setupBlurFiter(sprite, strength, quality) {
 function setupCircleMaskGraphics(radius = 60) {
   return new PIXI.Graphics()
     .beginFill(0xff0000)
-    .drawCircle(0, 0, radius)
+    .drawCircle(0, 0, radius * 2)
     .endFill();
 }
 
@@ -178,14 +193,36 @@ function setup() {
   viewport.addChild(clearSprite);
   viewport.addChild(blurSprite);
 
-  setupRing();
-  setupDisplacement(190, 190);
+  //setupRing();
+  //setupDisplacement(190, 190);
+
+  const vertUniforms = {
+    min_sigma: 0.0,
+    max_sigma: 3.0,
+    sigma: 5,
+    dim: 0.005,
+    kernel: 8.0,
+  };
+  const horiUniforms = {
+    min_sigma: 0.0,
+    max_sigma: 3.0,
+    sigma: 5,
+    dim: 0.005,
+    kernel: 8.0,
+  };
+
+  const vShader = PIXI.Loader.shared.resources["vertfrag"].data;
+  const hShader = PIXI.Loader.shared.resources["horifrag"].data;
+  vertFilter = new PIXI.Filter(null, vShader, vertUniforms);
+  horiFilter = new PIXI.Filter(null, hShader, horiUniforms);
 
   setupLensBlur();
   setupLensClear();
 
-  setupBlurFiter(bgSprite, 20, 2);
-  setupBlurFiter(blurSprite, 30, 10);
+  semicircle.filters = [vertFilter, horiFilter];
+
+  //setupBlurFiter(bgSprite, 30, 20);
+  //setupBlurFiter(blurSprite, 20, 10);
 
   //Configure viewport
 
