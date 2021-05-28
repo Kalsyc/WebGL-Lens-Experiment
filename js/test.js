@@ -22,8 +22,12 @@ function initialize() {
         url: "./shaders/shader.frag",
       },
       {
-        name: "test",
+        name: "horifrag",
         url: "./shaders/test2.frag",
+      },
+      {
+        name: "vertfrag",
+        url: "./shaders/test3.frag",
       },
     ])
     .load(setup);
@@ -43,28 +47,26 @@ function setup() {
   restrictSize(clearSprite);
   app.stage.addChild(clearSprite);
   //sprite.filters = [new PIXI.filters.BlurFilter(20, 5)];
-  const uniforms = {
+  const vertUniforms = {
+    min_sigma: 0.0,
+    max_sigma: 3.0,
     sigma: 5,
-    blurSize: 1 / clearSprite.height,
-    x_vec: 0.0,
-    y_vec: 1.0,
+    dim: 0.001,
+    kernel: 8.0,
   };
-  const uniforms2 = {
+  const horiUniforms = {
+    min_sigma: 0.0,
+    max_sigma: 3.0,
     sigma: 5,
-    blurSize: 1 / clearSprite.width,
-    x_vec: 1.0,
-    y_vec: 0.0,
+    dim: 0.001,
+    kernel: 8.0,
   };
-  const uniforms3 = {
-    iter: 0.4,
-  };
-  const vShader = blurShader.innerText;
-  //const fShader = PIXI.Loader.shared.resources["fragShader"].data;
-  const fShader = PIXI.Loader.shared.resources["test"].data;
-  const vertFilter = new PIXI.Filter(null, fShader, uniforms);
-  const horiFilter = new PIXI.Filter(null, fShader, uniforms2);
-  const testFilter = new PIXI.Filter(null, fShader, uniforms3);
-  clearSprite.filters = [vertFilter, horiFilter];
+
+  const vShader = PIXI.Loader.shared.resources["vertfrag"].data;
+  const hShader = PIXI.Loader.shared.resources["horifrag"].data;
+  const vertFilter = new PIXI.Filter(null, vShader, vertUniforms);
+  const horiFilter = new PIXI.Filter(null, hShader, horiUniforms);
+  clearSprite.filters = [horiFilter, vertFilter];
 }
 
 window.onload = () => {

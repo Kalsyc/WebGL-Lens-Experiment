@@ -16,6 +16,12 @@ void main(void) {
   incrementalGaussian.y = exp(-0.5 / (sigma * sigma));
   incrementalGaussian.z = incrementalGaussian.y * incrementalGaussian.y;
 
+  //  float gaussValuesFour[4];
+  //gaussValuesFour[0] = 0.028532;
+  //gaussValuesFour[1] = 0.067234;
+  //gaussValuesFour[2] = 0.124009;
+  //gaussValuesFour[3] = 0.179043;
+
   vec4 avgValue = vec4(0.0, 0.0, 0.0, 0.0);
   float coefficientSum = 0.0;
 
