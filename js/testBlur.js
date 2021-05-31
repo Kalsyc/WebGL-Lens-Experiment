@@ -33,6 +33,10 @@ function initialize() {
         name: "vertBlurRL",
         url: "./shaders/vertBlurRL.frag",
       },
+      {
+        name: "defaultVert",
+        url: "./shaders/defaultVertex.vert",
+      },
     ])
     .load(setup);
 }
@@ -65,8 +69,9 @@ function setup() {
 
   const vShader = PIXI.Loader.shared.resources["vertBlurRL"].data;
   const hShader = PIXI.Loader.shared.resources["horzBlurRL"].data;
-  const vertFilter = new PIXI.Filter(null, vShader, vertUniforms);
-  const horiFilter = new PIXI.Filter(null, hShader, horiUniforms);
+  const vert = PIXI.Loader.shared.resources["defaultVert"].data;
+  const vertFilter = new PIXI.Filter(vert, vShader, vertUniforms);
+  const horiFilter = new PIXI.Filter(vert, hShader, horiUniforms);
   clearSprite.filters = [horiFilter, vertFilter];
 }
 
