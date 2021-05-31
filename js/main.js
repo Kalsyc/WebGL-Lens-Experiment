@@ -62,12 +62,20 @@ function initializeMainRenderer() {
         url: "./images/semicircle-all.png",
       },
       {
-        name: "horifrag",
-        url: "./shaders/test2.frag",
+        name: "horzBlurLR",
+        url: "./shaders/horzBlurLR.frag",
       },
       {
-        name: "vertfrag",
-        url: "./shaders/test3.frag",
+        name: "horzBlurRL",
+        url: "./shaders/horzBlurRL.frag",
+      },
+      {
+        name: "vertBlurLR",
+        url: "./shaders/vertBlurLR.frag",
+      },
+      {
+        name: "vertBlurRL",
+        url: "./shaders/vertBlurRL.frag",
       },
     ])
     .load(setup);
@@ -198,21 +206,19 @@ function setup() {
 
   const vertUniforms = {
     min_sigma: 0.0,
-    max_sigma: 3.0,
-    sigma: 5,
-    dim: 0.005,
-    kernel: 8.0,
+    max_sigma: 2.0,
+    pixelSize: 1 / 512,
+    kernel: 3.0,
   };
   const horiUniforms = {
     min_sigma: 0.0,
-    max_sigma: 3.0,
-    sigma: 5,
-    dim: 0.005,
-    kernel: 8.0,
+    max_sigma: 2.0,
+    pixelSize: 1 / 512,
+    kernel: 3.0,
   };
 
-  const vShader = PIXI.Loader.shared.resources["vertfrag"].data;
-  const hShader = PIXI.Loader.shared.resources["horifrag"].data;
+  const vShader = PIXI.Loader.shared.resources["vertBlurLR"].data;
+  const hShader = PIXI.Loader.shared.resources["horzBlurLR"].data;
   vertFilter = new PIXI.Filter(null, vShader, vertUniforms);
   horiFilter = new PIXI.Filter(null, hShader, horiUniforms);
 

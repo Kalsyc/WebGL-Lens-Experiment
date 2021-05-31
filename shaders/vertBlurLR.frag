@@ -1,15 +1,18 @@
-uniform float pixelSize;
-uniform float kernel;
-uniform float min_sigma;
-uniform float max_sigma;
+// Vertical (Y) Blur Fragment Shader (Left to Right)
+
+uniform float pixelSize; // size of pixel (height)
+uniform float kernel; // radius size of kernel
+uniform float min_sigma; // minimum intensity of blur
+uniform float max_sigma; // maximum intensity of blur
 
 varying vec2 vTextureCoord;
 uniform vec4 dimensions;
 uniform sampler2D uSampler;
 
 const float pi = 3.14159265;
-const float maxPixelsPerSide = 15.0;
+const float maxPixelsPerSide = 15.0; // Fallback
 
+// Function that calculates the weight of the pixel
 float calculateWeight(float offset, float sd) {
   if (sd <= 0.000001) {
     sd = 0.000001;
@@ -34,11 +37,10 @@ void main(void) {
       break;
     }
     current = calculateWeight(i, sd);
-    avgValue += texture2D(uSampler, vec2(vTextureCoord.x - i * pixelSize, vTextureCoord.y)) * current;   
-    avgValue += texture2D(uSampler, vec2(vTextureCoord.x + i * pixelSize, vTextureCoord.y)) * current;
+    avgValue += texture2D(uSampler, vec2(vTextureCoord.x, vTextureCoord.y - i * pixelSize)) * current;   
+    avgValue += texture2D(uSampler, vec2(vTextureCoord.x, vTextureCoord.y + i * pixelSize)) * current;
     remainder -= current * 2.0;
   }
   avgValue +=  texture2D(uSampler, vTextureCoord.st) * remainder;
   gl_FragColor = avgValue;
-
 }

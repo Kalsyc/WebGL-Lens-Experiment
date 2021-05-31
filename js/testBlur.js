@@ -18,12 +18,20 @@ function initialize() {
         url: "./images/grid2.jpg",
       },
       {
-        name: "horifrag",
-        url: "./shaders/horizontalBlur.frag",
+        name: "horzBlurLR",
+        url: "./shaders/horzBlurLR.frag",
       },
       {
-        name: "vertfrag",
-        url: "./shaders/verticalBlur.frag",
+        name: "horzBlurRL",
+        url: "./shaders/horzBlurRL.frag",
+      },
+      {
+        name: "vertBlurLR",
+        url: "./shaders/vertBlurLR.frag",
+      },
+      {
+        name: "vertBlurRL",
+        url: "./shaders/vertBlurRL.frag",
       },
     ])
     .load(setup);
@@ -55,8 +63,8 @@ function setup() {
     kernel: 3.0,
   };
 
-  const vShader = PIXI.Loader.shared.resources["vertfrag"].data;
-  const hShader = PIXI.Loader.shared.resources["horifrag"].data;
+  const vShader = PIXI.Loader.shared.resources["vertBlurRL"].data;
+  const hShader = PIXI.Loader.shared.resources["horzBlurRL"].data;
   const vertFilter = new PIXI.Filter(null, vShader, vertUniforms);
   const horiFilter = new PIXI.Filter(null, hShader, horiUniforms);
   clearSprite.filters = [horiFilter, vertFilter];
