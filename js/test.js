@@ -39,22 +39,20 @@ function restrictSize(sprite) {
 }
 
 function setup() {
-  clearSprite = instantiateSprite("grid");
+  clearSprite = instantiateSprite("focus");
   restrictSize(clearSprite);
   app.stage.addChild(clearSprite);
   const vertUniforms = {
     min_sigma: 0.0,
     max_sigma: 2.0,
-    sigma: 5,
-    dim: 0.003,
-    kernel: 8.0,
+    pixelSize: 1 / 512,
+    kernel: 3.0,
   };
   const horiUniforms = {
     min_sigma: 0.0,
     max_sigma: 2.0,
-    sigma: 5,
-    dim: 0.003,
-    kernel: 8.0,
+    pixelSize: 1 / 512,
+    kernel: 3.0,
   };
 
   const vShader = PIXI.Loader.shared.resources["vertfrag"].data;

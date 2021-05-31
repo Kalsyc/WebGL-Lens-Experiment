@@ -1,4 +1,4 @@
-uniform float dim;
+uniform float pixelSize;
 uniform float kernel;
 uniform float min_sigma;
 uniform float max_sigma;
@@ -8,7 +8,7 @@ uniform vec4 dimensions;
 uniform sampler2D uSampler;
 
 const float pi = 3.14159265;
-const float numBlurPixelsPerSide = 8.0;
+const float maxPixelsPerSide = 15.0;
 
 float calculateWeight(float offset, float sd) {
   if (sd <= 0.000001) {
@@ -25,14 +25,19 @@ float calculateWeight(float offset, float sd) {
 }
 
 void main(void) {
-  vec3 incrementalGaussian;
   vec4 avgValue = vec4(0.0, 0.0, 0.0, 0.0);
   float sd = (max_sigma - min_sigma) * vTextureCoord.x;
-  avgValue += texture2D(uSampler, vTextureCoord.st) * calculateWeight(0.0, sd);
-  for (float i = 1.0; i <= numBlurPixelsPerSide; i++) {
-    avgValue += texture2D(uSampler, vec2(vTextureCoord.x, vTextureCoord.y - i * dim)) * calculateWeight(i, sd);   
-    avgValue += texture2D(uSampler, vec2(vTextureCoord.x, vTextureCoord.y + i * dim)) * calculateWeight(i, sd); 
+  float remainder = 1.0;
+  float current;
+  for (float i = 1.0; i <= maxPixelsPerSide; i++) {
+    if (i > kernel) {
+      break;
+    }
+    current = calculateWeight(i, sd);
+    avgValue += texture2D(uSampler, vec2(vTextureCoord.x, vTextureCoord.y - i * pixelSize)) * current;   
+    avgValue += texture2D(uSampler, vec2(vTextureCoord.x, vTextureCoord.y + i * pixelSize)) * current;
+    remainder -= current * 2.0;
   }
+  avgValue +=  texture2D(uSampler, vTextureCoord.st) * remainder;
   gl_FragColor = avgValue;
-
 }
