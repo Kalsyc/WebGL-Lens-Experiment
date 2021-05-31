@@ -1,7 +1,3 @@
-//import fragShader from "./../shaders/fragShader";
-//import horizontalBlurShader from "./../shaders/horizontalBlurShader";
-//import verticalBlurshader from "./../shaders/verticalBlurShader";
-
 var app, clearSprite;
 
 function initialize() {
@@ -22,16 +18,12 @@ function initialize() {
         url: "./images/grid2.jpg",
       },
       {
-        name: "fragShader",
-        url: "./shaders/shader.frag",
-      },
-      {
         name: "horifrag",
-        url: "./shaders/test2.frag",
+        url: "./shaders/horizontalBlur.frag",
       },
       {
         name: "vertfrag",
-        url: "./shaders/test3.frag",
+        url: "./shaders/verticalBlur.frag",
       },
     ])
     .load(setup);
@@ -50,7 +42,6 @@ function setup() {
   clearSprite = instantiateSprite("grid");
   restrictSize(clearSprite);
   app.stage.addChild(clearSprite);
-  //sprite.filters = [new PIXI.filters.BlurFilter(20, 5)];
   const vertUniforms = {
     min_sigma: 0.0,
     max_sigma: 2.0,
@@ -71,7 +62,6 @@ function setup() {
   const vertFilter = new PIXI.Filter(null, vShader, vertUniforms);
   const horiFilter = new PIXI.Filter(null, hShader, horiUniforms);
   clearSprite.filters = [horiFilter, vertFilter];
-  //clearSprite.filters = [new PIXI.filters.BlurFilter()];
 }
 
 window.onload = () => {

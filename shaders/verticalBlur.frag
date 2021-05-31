@@ -26,16 +26,12 @@ float calculateWeight(float offset, float sd) {
 
 void main(void) {
   vec3 incrementalGaussian;
-  
   vec4 avgValue = vec4(0.0, 0.0, 0.0, 0.0);
-
   float sd = (max_sigma - min_sigma) * vTextureCoord.x;
-
   avgValue += texture2D(uSampler, vTextureCoord.st) * calculateWeight(0.0, sd);
-
   for (float i = 1.0; i <= numBlurPixelsPerSide; i++) {
-    avgValue += texture2D(uSampler, vec2(vTextureCoord.x - i * dim, vTextureCoord.y)) * calculateWeight(i, sd);   
-    avgValue += texture2D(uSampler, vec2(vTextureCoord.x + i * dim, vTextureCoord.y)) * calculateWeight(i, sd); 
+    avgValue += texture2D(uSampler, vec2(vTextureCoord.x, vTextureCoord.y - i * dim)) * calculateWeight(i, sd);   
+    avgValue += texture2D(uSampler, vec2(vTextureCoord.x, vTextureCoord.y + i * dim)) * calculateWeight(i, sd); 
   }
   gl_FragColor = avgValue;
 
